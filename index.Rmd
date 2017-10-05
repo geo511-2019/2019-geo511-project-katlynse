@@ -1,9 +1,15 @@
 ---
-title: ""
+title: "I have the best titles"
 subtitle: "My Really Cool Project"
 ---
 
-# Abstract
+# Introduction
 
-# Description
+# Materials and methods
+
+# Results
+
+# Conclusions
+
+# References
 

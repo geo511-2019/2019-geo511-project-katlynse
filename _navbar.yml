@@ -1,10 +1,8 @@
-title: "Spatial Data Science"
+title: "R Data Science Final Project"
 type: inverse
 left:
   - text: "Home"
     href: index.html
-  - text: "Schedule"
-    href: Schedule.html
 right:
   - icon: fa-github fa-lg
     href: https://github.com/adammwilson/RDataScience

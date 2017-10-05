@@ -1,7 +1,7 @@
 output_dir: 'docs'
 output:
   html_document:
-    theme: cosmo
+    theme: simplex  # choose your theme here: https://bootswatch.com/
     highlight: textmate
     mathjax: null
     toc: true
