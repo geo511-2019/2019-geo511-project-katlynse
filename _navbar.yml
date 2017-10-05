@@ -1,0 +1,10 @@
+title: "Spatial Data Science"
+type: inverse
+left:
+  - text: "Home"
+    href: index.html
+  - text: "Schedule"
+    href: Schedule.html
+right:
+  - icon: fa-github fa-lg
+    href: https://github.com/adammwilson/RDataScience
