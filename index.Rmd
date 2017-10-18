@@ -1,15 +1,61 @@
 ---
 title: "I have the best titles"
-subtitle: "My Really Cool Project"
+author: Your name here
+subtitle: Subtitle here if desired
 ---
 
 # Introduction
+My really awesome and complete introduction will go here.  
+
+> I know words.  I have the best words.  ~ Donald Trump
 
 # Materials and methods
 
+Narrative and most code will go here.  Describe what you are doing and show how to do it (with code).
+
+Load these packages in a code chunk (you may need to install some packages):
+
+```{r, message=F, warning=F}
+library(dplyr)
+library(ggplot2)
+library(maps)
+library(spocc)
+knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
+```
+
+
+We are going to use the `occ()` function to download _occurrence_ records for the American robin (_Turdus migratorius_) from the [Global Biodiversity Information Facility](gbif.org).
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Turdus-migratorius-002.jpg" alt="alt text" width="200">
+<small><small><small>Licensed under CC BY-SA 3.0 via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Turdus-migratorius-002.jpg#/media/File:Turdus-migratorius-002.jpg)</small></small></small>
+
+```{r, warning=F} 
+## define which species to query
+sp='Turdus migratorius'
+
+## run the query and convert to data.frame()
+d = occ(query=sp, from='ebird',limit = 100) %>% occ2df()
+```
+This can take a few seconds.
+
+```{r, fig.width=6, fig.cap="Map illustrating the known occurrence locations"}
+# Load coastline
+map=map_data("world")
+
+ggplot(d,aes(x=longitude,y=latitude))+
+  geom_polygon(aes(x=long,y=lat,group=group),data=map)+
+  geom_point(col="red")+
+  coord_equal()
+```
+
+
 # Results
 
+Show tables, plots, etc. and describe them.
+
 # Conclusions
+
+What have you learned?  Are there any broader implications?
 
 # References
 
