@@ -13,7 +13,27 @@ My really awesome and complete introduction will go here.
 
 Narrative and most code will go here.  Describe what you are doing and show how to do it (with code).
 
-Load these packages in a code chunk (you may need to install some packages):
+You can do bullets like this:
+
+* The first most important thing
+* The second most important thing
+* The third most important thing
+
+You can do numbers like this:
+
+1. The first most important thing
+2. The second most important thing
+3. The third most important thing
+
+See [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/) for all the amazing things you can do.
+
+
+Here's my first code chunk.
+```{r}
+1+2
+```
+
+Load any required packages in a code chunk (you may need to install some packages):
 
 ```{r, message=F, warning=F}
 library(dplyr)
@@ -38,7 +58,7 @@ d = occ(query=sp, from='ebird',limit = 100) %>% occ2df()
 ```
 This can take a few seconds.
 
-```{r, fig.width=6, fig.cap="Map illustrating the known occurrence locations"}
+```{r, fig.width=6, fig.height=3, fig.cap="Map illustrating the known occurrence locations"}
 # Load coastline
 map=map_data("world")
 

@@ -313,7 +313,23 @@ div.tocify {
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
 <p>Narrative and most code will go here. Describe what you are doing and show how to do it (with code).</p>
-<p>Load these packages in a code chunk (you may need to install some packages):</p>
+<p>You can do bullets like this:</p>
+<ul>
+<li>The first most important thing</li>
+<li>The second most important thing</li>
+<li>The third most important thing</li>
+</ul>
+<p>You can do numbers like this:</p>
+<ol style="list-style-type: decimal">
+<li>The first most important thing</li>
+<li>The second most important thing</li>
+<li>The third most important thing</li>
+</ol>
+<p>See <a href="http://rmarkdown.rstudio.com/" class="uri">http://rmarkdown.rstudio.com/</a> for all the amazing things you can do.</p>
+<p>Here’s my first code chunk.</p>
+<pre class="r"><code>1+2</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>Load any required packages in a code chunk (you may need to install some packages):</p>
 <pre class="r"><code>library(dplyr)
 library(ggplot2)
 library(maps)
@@ -335,7 +351,7 @@ ggplot(d,aes(x=longitude,y=latitude))+
   geom_point(col=&quot;red&quot;)+
   coord_equal()</code></pre>
 <div class="figure">
-<img src="index_files/figure-html/unnamed-chunk-3-1.png" alt="Map illustrating the known occurrence locations" width="576" />
+<img src="index_files/figure-html/unnamed-chunk-4-1.png" alt="Map illustrating the known occurrence locations" width="576" />
 <p class="caption">
 Map illustrating the known occurrence locations
 </p>
@@ -359,7 +375,7 @@ Map illustrating the known occurrence locations
 
 <footer id="site-footer">
   <div id="footer1">
-  <a href="http://www.adamwilson.us"><img src="img/wilson.png" alt="logo" width=40px></a>
+  This website is a project for Adam Wilson's <a href="http://www.adamwilson.us/RDataScience"><i> Spatial Data Science (GEO503) </i></a>Course at the University at Buffalo
   </div>
   <div id="footer2">
   <a rel="license" property="http://creativecommons.org/ns#license"
