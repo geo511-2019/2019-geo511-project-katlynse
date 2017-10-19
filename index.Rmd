@@ -73,6 +73,10 @@ ggplot(d,aes(x=longitude,y=latitude))+
 
 Show tables, plots, etc. and describe them.
 
+```{r}
+summary(d)
+```
+
 # Conclusions
 
 What have you learned?  Are there any broader implications?
