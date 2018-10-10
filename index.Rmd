@@ -74,7 +74,7 @@ ggplot(d,aes(x=longitude,y=latitude))+
 Show tables, plots, etc. and describe them.
 
 ```{r}
-summary(d)
+hist(d$latitude)
 ```
 
 # Conclusions
