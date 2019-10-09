@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Your name here" />
@@ -14,7 +15,7 @@
 
 <title>I have the best titles</title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -26,9 +27,15 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
-<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-binding-2.0.2/leaflet.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -77,9 +84,7 @@ h6 {
 
 <link rel="stylesheet" href="styles.css" type="text/css" />
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -93,7 +98,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -103,6 +107,9 @@ img {
 }
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -118,7 +125,6 @@ body {
   padding-top: 46px;
   margin-top: -46px;
 }
-
 .section h2 {
   padding-top: 46px;
   margin-top: -46px;
@@ -138,6 +144,43 @@ body {
 .section h6 {
   padding-top: 46px;
   margin-top: -46px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -159,47 +202,65 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
-
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -248,8 +309,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -258,6 +317,16 @@ div.tocify {
 
 
 </style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
@@ -288,12 +357,7 @@ div.tocify {
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/AdamWilsonLab/SpatialDataScience">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -304,8 +368,8 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">I have the best titles</h1>
-<h3 class="subtitle"><em>Subtitle here if desired</em></h3>
-<h4 class="author"><em>Your name here</em></h4>
+<h3 class="subtitle">Subtitle here if desired</h3>
+<h4 class="author">Your name here</h4>
 
 </div>
 
@@ -313,9 +377,6 @@ div.tocify {
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>My really awesome and complete introduction will go here.</p>
-<blockquote>
-<p>I know words. I have the best words. ~ Donald Trump</p>
-</blockquote>
 </div>
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
@@ -332,43 +393,244 @@ div.tocify {
 <li>The second most important thing</li>
 <li>The third most important thing</li>
 </ol>
-<p>See <a href="http://rmarkdown.rstudio.com/" class="uri">http://rmarkdown.rstudio.com/</a> for all the amazing things you can do.</p>
+<p>See <a href="http://rmarkdown.rstudio.com/">http://rmarkdown.rstudio.com/</a> for all the amazing things you can do.</p>
 <p>Here’s my first code chunk.</p>
 <pre class="r"><code>1+2</code></pre>
 <pre><code>## [1] 3</code></pre>
 <p>Load any required packages in a code chunk (you may need to install some packages):</p>
-<pre class="r"><code>library(dplyr)
-library(ggplot2)
-library(maps)
-library(spocc)
+<pre class="r"><code>library(tidyverse)
+library(leaflet)
+library(kableExtra)
 knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling</code></pre>
-<p>We are going to use the <code>occ()</code> function to download <em>occurrence</em> records for the American robin (<em>Turdus migratorius</em>) from the <a href="gbif.org">Global Biodiversity Information Facility</a>.</p>
-<p><img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Turdus-migratorius-002.jpg" alt="alt text" width="200"> <small><small><small>Licensed under CC BY-SA 3.0 via <a href="https://commons.wikimedia.org/wiki/File:Turdus-migratorius-002.jpg#/media/File:Turdus-migratorius-002.jpg">Wikimedia Commons</a></small></small></small></p>
-<pre class="r"><code>## define which species to query
-sp=&#39;Turdus migratorius&#39;
-
-## run the query and convert to data.frame()
-d = occ(query=sp, from=&#39;ebird&#39;,limit = 100) %&gt;% occ2df()</code></pre>
-<p>This can take a few seconds.</p>
-<pre class="r"><code># Load coastline
-map=map_data(&quot;world&quot;)
-
-ggplot(d,aes(x=longitude,y=latitude))+
-  geom_polygon(aes(x=long,y=lat,group=group),data=map)+
-  geom_point(col=&quot;red&quot;)+
-  coord_equal()</code></pre>
-<div class="figure">
-<img src="index_files/figure-html/unnamed-chunk-4-1.png" alt="Map illustrating the known occurrence locations" width="576" />
-<p class="caption">
-Map illustrating the known occurrence locations
-</p>
+<div id="download-and-clean-all-required-data" class="section level2">
+<h2>Download and clean all required data</h2>
+<pre class="r"><code>n=20
+data=data.frame(x=runif(n,-180,180),
+                y=runif(n,-60,60),
+                size = runif(n, 5, 20),
+                category = factor(
+                  sample(letters[1:5], n, replace = TRUE)
+                  ),
+                value = rnorm(n))</code></pre>
+<pre class="r"><code>data %&gt;% 
+  slice(1:10) %&gt;% #show only 1:n rows
+  kable(digits=2,align=&quot;c&quot;)%&gt;% #make table and round to two digits
+  kable_styling(bootstrap_options = 
+                  c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;)) #apply other formatting</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:center;">
+x
+</th>
+<th style="text-align:center;">
+y
+</th>
+<th style="text-align:center;">
+size
+</th>
+<th style="text-align:center;">
+category
+</th>
+<th style="text-align:center;">
+value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+-175.18
+</td>
+<td style="text-align:center;">
+-15.00
+</td>
+<td style="text-align:center;">
+7.00
+</td>
+<td style="text-align:center;">
+e
+</td>
+<td style="text-align:center;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+-156.19
+</td>
+<td style="text-align:center;">
+-14.14
+</td>
+<td style="text-align:center;">
+5.67
+</td>
+<td style="text-align:center;">
+a
+</td>
+<td style="text-align:center;">
+2.29
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+20.87
+</td>
+<td style="text-align:center;">
+-47.94
+</td>
+<td style="text-align:center;">
+18.75
+</td>
+<td style="text-align:center;">
+a
+</td>
+<td style="text-align:center;">
+-1.37
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+97.13
+</td>
+<td style="text-align:center;">
+23.22
+</td>
+<td style="text-align:center;">
+10.47
+</td>
+<td style="text-align:center;">
+d
+</td>
+<td style="text-align:center;">
+-0.13
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+-100.23
+</td>
+<td style="text-align:center;">
+12.01
+</td>
+<td style="text-align:center;">
+5.14
+</td>
+<td style="text-align:center;">
+c
+</td>
+<td style="text-align:center;">
+-3.00
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+121.34
+</td>
+<td style="text-align:center;">
+59.66
+</td>
+<td style="text-align:center;">
+18.39
+</td>
+<td style="text-align:center;">
+e
+</td>
+<td style="text-align:center;">
+1.97
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+66.38
+</td>
+<td style="text-align:center;">
+-18.73
+</td>
+<td style="text-align:center;">
+9.35
+</td>
+<td style="text-align:center;">
+d
+</td>
+<td style="text-align:center;">
+0.68
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+-145.81
+</td>
+<td style="text-align:center;">
+-46.56
+</td>
+<td style="text-align:center;">
+11.57
+</td>
+<td style="text-align:center;">
+b
+</td>
+<td style="text-align:center;">
+-0.34
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+159.17
+</td>
+<td style="text-align:center;">
+48.53
+</td>
+<td style="text-align:center;">
+14.99
+</td>
+<td style="text-align:center;">
+b
+</td>
+<td style="text-align:center;">
+-2.23
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+-129.10
+</td>
+<td style="text-align:center;">
+-59.74
+</td>
+<td style="text-align:center;">
+18.91
+</td>
+<td style="text-align:center;">
+b
+</td>
+<td style="text-align:center;">
+-0.35
+</td>
+</tr>
+</tbody>
+</table>
+<p>Add any additional processing steps here.</p>
 </div>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
 <p>Show tables, plots, etc. and describe them.</p>
-<pre class="r"><code>hist(d$latitude)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>m &lt;- leaflet(data) %&gt;% 
+  addTiles() %&gt;% 
+  addCircleMarkers(~x, ~y, radius = ~size,color=~category)
+m  # a map with the default OSM tile layer</code></pre>
+<div class="figure">
+<div id="htmlwidget-6c3e8e4b364322b4c717" style="width:576px;height:288px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6c3e8e4b364322b4c717">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[[-14.9990496318787,-14.1425578482449,-47.937785955146,23.2246373500675,12.0140750147402,59.6565782558173,-18.734748121351,-46.5595482755452,48.5311427805573,-59.7428968548775,-45.8097747992724,-17.9679116047919,11.8715448305011,37.8119112364948,-0.509222522377968,47.7842772938311,23.233160879463,-49.0173826832324,36.4987395331264,41.0007195733488],[-175.181908300146,-156.191962519661,20.8724004495889,97.1336986497045,-100.227176304907,121.344821602106,66.3847352284938,-145.814246395603,159.173704627901,-129.102302407846,68.3534577861428,5.6629135273397,115.466055460274,95.05245834589,107.708545736969,171.813281765208,154.443794991821,-43.0141758453101,-143.19836916402,86.8726778123528],[6.99775445973501,5.67242127144709,18.7510148261208,10.4654943244532,5.14062191476114,18.3901090046857,9.35100446688011,11.5656995680183,14.9926926929038,18.9147341717035,19.1231192438863,17.9559715325013,5.70121329394169,9.68357505858876,17.2650242608506,9.21331325662322,7.71976947551593,9.28765372140333,16.8878742691595,13.8479006558191],null,null,{"interactive":true,"className":"","stroke":true,"color":["e","a","a","d","c","e","d","b","b","b","a","e","b","e","e","a","b","c","d","a"],"weight":5,"opacity":0.5,"fill":true,"fillColor":["e","a","a","d","c","e","d","b","b","b","a","e","b","e","e","a","b","c","d","a"],"fillOpacity":0.2},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-59.7428968548775,59.6565782558173],"lng":[-175.181908300146,171.813281765208]}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Map of completely random data
+</p>
+</div>
+<pre class="r"><code>data %&gt;% 
+  ggplot(aes(x=x,y=y,col=category))+
+  geom_point()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
@@ -384,7 +646,7 @@ Map illustrating the known occurrence locations
 
 <footer id="site-footer">
   <div id="footer1">
-  This website is a project for Adam Wilson's <a href="https://github.com/AdamWilsonLab/SpatialDataScience"><i> Spatial Data Science (GEO503) </i></a>Course at the University at Buffalo
+  This website is a project for Adam Wilson's <a href="https://wilsonlab.io/GEO511"><i> Spatial Data Science (GEO511) </i></a>Course at the University at Buffalo
   </div>
   <div id="footer2">
   <a rel="license" property="http://creativecommons.org/ns#license"
@@ -409,6 +671,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 
