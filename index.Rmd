@@ -1,7 +1,7 @@
 ---
-title: "I have the best titles"
-author: Your name here
-subtitle: Subtitle here if desired
+title: The Construction and Deconstruction of Empanada
+author: Katlyn Sewell
+subtitle: Using lava flow morphology and mass wasting scars to determine if Empanada fell apart while it was being built  
 ---
 
 # Introduction
