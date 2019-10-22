@@ -1,6 +1,15 @@
-[<i class="fa fa-file-code-o fa-1x" aria-hidden="true"></i> Download this file as a template ](`r knitr::current_input()`).
+---
+title: "Project Proposal: Seamount Mass-wasting"
+author: "Katlyn Sewell"
+output:
+  html_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rmarkdown)
+library(knitr)
+```
 
-# Project Proposal: Seamount Mass-Wasting
 ## Introduction to problem/question
   Seamounts are oceanic volcanoes that form at nearly all seafloor tectonic settings. As oceanic plates are pulled apart, fissures form and eruptions of basaltic melt derived from decompression melting of the mantle occur. Over the course of hours to days, magmatic eruptions are focused in the center of the fissure because the thinner ends cool more rapidly. As the lava from this focused erutpion cools it builds the flanks of the seamount. Mass-wasting events are recorded in the morphology of seamounts as amphitheater shaped head scarps, talus, and erosive channels. Very few seamounts have been observed during construction, largely due to their remote location at the seafloor and difficulty detecting an erupting seamount from the surface. For these reasons much of their construction and deconstruction is based on scientific assumptions.  
   
