@@ -60,7 +60,7 @@ For reproducability, the features observed from the videos will be added to spre
 
 I hope to use the 'raster' package to overlay polygons of the the lava flows and mass-wasting scars, with 'rgdal' to create a new raster layer of this overlay.
 
-If this doesn't work out my back-up plan is to the function 'annotate to indicate where the features are although this will be a less effective method of communicating the relationships between features.
+If this doesn't work out my back-up plan is to the function 'annotate' to indicate where the features are although this will be a less effective method of communicating the relationships between features.
 
 ## Expected results
 
