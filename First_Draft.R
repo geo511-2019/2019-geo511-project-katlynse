@@ -8,4 +8,9 @@ sm <- raster("dsa2_2m.grd")
 
 sm_crop <- crop(sm, extent(615000, 618000, 232000, 234000))
 
-plot(sm_crop)
+elev <- as.matrix(sm_crop$z)
+
+sm_matrix <- as.matrix(sm_crop) 
+
+empanada <- persp3D(x=sm_matrix, y=sm_matrix, z=elev)
+
