@@ -15,7 +15,7 @@
 
 <title>The Construction and Deconstruction of Empanada</title>
 
-<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -27,15 +27,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
-<script src="site_libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
-<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
-<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
-<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
-<script src="site_libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
-<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
-<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
-<script src="site_libs/leaflet-binding-2.0.2/leaflet.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -381,262 +372,43 @@ div.tocify {
 </div>
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
-<p>Narrative and most code will go here. Describe what you are doing and show how to do it (with code).</p>
-<p>You can do bullets like this:</p>
-<ul>
-<li>The first most important thing</li>
-<li>The second most important thing</li>
-<li>The third most important thing</li>
-</ul>
-<p>You can do numbers like this:</p>
 <ol style="list-style-type: decimal">
-<li>The first most important thing</li>
-<li>The second most important thing</li>
-<li>The third most important thing</li>
+<li>load requied packages (you may need to install some of them)</li>
 </ol>
-<p>See <a href="http://rmarkdown.rstudio.com/">http://rmarkdown.rstudio.com/</a> for all the amazing things you can do.</p>
-<p>Here’s my first code chunk.</p>
-<pre class="r"><code>1+2</code></pre>
-<pre><code>## [1] 3</code></pre>
-<p>Load any required packages in a code chunk (you may need to install some packages):</p>
-<pre class="r"><code>library(tidyverse)
-library(leaflet)
-library(kableExtra)
-knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling</code></pre>
+<pre class="r"><code>library(ncdf4) # package for netcdf manipulation
+library(raster) # package for raster manipulation
+library(rgdal) # package for geospatial analysis
+library(ggplot2) # package for plotting
+library(plot3D) #package for 3D plotting</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>open the raster file and assign it to an object</li>
+</ol>
+<pre class="r"><code>sm &lt;- raster(&quot;dsa2_2m.grd&quot;)</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>crop the raster object to the extent of the seamount</li>
+</ol>
+<pre class="r"><code>sm_crop &lt;- crop(sm, extent(615000, 618000, 232000, 234000))</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>take a look at empanada</li>
+</ol>
+<pre><code>## class      : RasterLayer 
+## dimensions : 1003, 1503, 1507509  (nrow, ncol, ncell)
+## resolution : 1.995772, 1.995772  (x, y)
+## extent     : 615000.5, 618000.2, 231999.1, 234000.9  (xmin, xmax, ymin, ymax)
+## crs        : NA 
+## source     : /private/var/folders/kt/k885m46542s8yzyrjrvq62180000gn/T/RtmpWIUREP/raster/r_tmp_2019-11-16_121741_35622_81093.grd 
+## names      : z 
+## values     : 1577.398, 1751.706  (min, max)</code></pre>
 <div id="download-and-clean-all-required-data" class="section level2">
 <h2>Download and clean all required data</h2>
-<pre class="r"><code>n=20
-data=data.frame(x=runif(n,-180,180),
-                y=runif(n,-60,60),
-                size = runif(n, 5, 20),
-                category = factor(
-                  sample(letters[1:5], n, replace = TRUE)
-                  ),
-                value = rnorm(n))</code></pre>
-<pre class="r"><code>data %&gt;% 
-  slice(1:10) %&gt;% #show only 1:n rows
-  kable(digits=2,align=&quot;c&quot;)%&gt;% #make table and round to two digits
-  kable_styling(bootstrap_options = 
-                  c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;, &quot;responsive&quot;)) #apply other formatting</code></pre>
-<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:center;">
-x
-</th>
-<th style="text-align:center;">
-y
-</th>
-<th style="text-align:center;">
-size
-</th>
-<th style="text-align:center;">
-category
-</th>
-<th style="text-align:center;">
-value
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;">
--117.69
-</td>
-<td style="text-align:center;">
--28.04
-</td>
-<td style="text-align:center;">
-6.49
-</td>
-<td style="text-align:center;">
-b
-</td>
-<td style="text-align:center;">
--0.62
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-151.89
-</td>
-<td style="text-align:center;">
--44.95
-</td>
-<td style="text-align:center;">
-15.06
-</td>
-<td style="text-align:center;">
-e
-</td>
-<td style="text-align:center;">
-0.47
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-145.01
-</td>
-<td style="text-align:center;">
-25.12
-</td>
-<td style="text-align:center;">
-19.23
-</td>
-<td style="text-align:center;">
-e
-</td>
-<td style="text-align:center;">
-0.34
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-136.91
-</td>
-<td style="text-align:center;">
-45.65
-</td>
-<td style="text-align:center;">
-10.07
-</td>
-<td style="text-align:center;">
-b
-</td>
-<td style="text-align:center;">
--0.10
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-79.28
-</td>
-<td style="text-align:center;">
--11.06
-</td>
-<td style="text-align:center;">
-17.59
-</td>
-<td style="text-align:center;">
-c
-</td>
-<td style="text-align:center;">
-0.05
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
--144.28
-</td>
-<td style="text-align:center;">
-29.27
-</td>
-<td style="text-align:center;">
-12.57
-</td>
-<td style="text-align:center;">
-e
-</td>
-<td style="text-align:center;">
--0.06
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-3.00
-</td>
-<td style="text-align:center;">
--1.08
-</td>
-<td style="text-align:center;">
-18.42
-</td>
-<td style="text-align:center;">
-a
-</td>
-<td style="text-align:center;">
--0.46
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-94.57
-</td>
-<td style="text-align:center;">
--48.17
-</td>
-<td style="text-align:center;">
-16.69
-</td>
-<td style="text-align:center;">
-b
-</td>
-<td style="text-align:center;">
--0.38
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
--73.82
-</td>
-<td style="text-align:center;">
--11.41
-</td>
-<td style="text-align:center;">
-8.00
-</td>
-<td style="text-align:center;">
-e
-</td>
-<td style="text-align:center;">
-0.54
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
--39.52
-</td>
-<td style="text-align:center;">
--50.10
-</td>
-<td style="text-align:center;">
-15.54
-</td>
-<td style="text-align:center;">
-a
-</td>
-<td style="text-align:center;">
-0.72
-</td>
-</tr>
-</tbody>
-</table>
-<p>Add any additional processing steps here.</p>
 </div>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
 <p>Show tables, plots, etc. and describe them.</p>
-<pre class="r"><code>m &lt;- leaflet(data) %&gt;% 
-  addTiles() %&gt;% 
-  addCircleMarkers(~x, ~y, radius = ~size,color = ~as.factor(category)) %&gt;% 
-  addPopups(~x[2], ~y[2], &quot;Random popup&quot;)
-m  # a map with the default OSM tile layer</code></pre>
-<div class="figure">
-<div id="htmlwidget-3fcc3d205cf5586db076" style="width:576px;height:288px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3fcc3d205cf5586db076">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[[-28.0443618446589,-44.9451674055308,25.1170976366848,45.651169270277,-11.0628301464021,29.2745390441269,-1.08006742782891,-48.173848958686,-11.4112542942166,-50.1008134055883,7.35841588117182,-29.000381687656,-44.9300433788449,-3.21018666028976,49.7160983551294,12.0780373457819,53.9147202763706,25.3977049514651,-22.7634940389544,-21.5055959578604],[-117.692054919899,151.891620559618,145.012161377817,136.908178813756,79.2786586191505,-144.279722431675,2.99823392182589,94.565246226266,-73.8190254382789,-39.5176704693586,165.890523539856,38.5335786268115,-16.4979805704206,-57.767580030486,133.530254988,-78.3240880072117,83.2211876939982,126.240166956559,121.513721309602,-7.90634809993207],[6.49412984377705,15.0585151812993,19.2273746232968,10.0739992049057,17.5907230260782,12.5661743048113,18.4176314657088,16.6916113009211,7.99713146756403,15.5397152795922,5.27984467684291,11.7495510086883,9.76083828601986,17.5949804077391,19.1967131884303,19.7723450756166,11.9691051100381,16.7765532142948,15.3626961377449,10.4306464502588],null,null,{"interactive":true,"className":"","stroke":true,"color":["b","e","e","b","c","e","a","b","e","a","b","d","b","c","e","b","c","c","d","e"],"weight":5,"opacity":0.5,"fill":true,"fillColor":["b","e","e","b","c","e","a","b","e","a","b","d","b","c","e","b","c","c","d","e"],"fillOpacity":0.2},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPopups","args":[-44.9451674055308,151.891620559618,"Random popup",null,null,{"maxWidth":300,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"className":""}]}],"limits":{"lat":[-50.1008134055883,53.9147202763706],"lng":[-144.279722431675,165.890523539856]}},"evals":[],"jsHooks":[]}</script>
-<p class="caption">
-Map of completely random data
-</p>
-</div>
-<pre class="r"><code>data %&gt;% 
-  ggplot(aes(x=x,y=y,col=category))+
-  geom_point()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
-<p>What have you learned? Are there any broader implications?</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>

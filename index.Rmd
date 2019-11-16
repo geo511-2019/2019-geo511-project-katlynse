@@ -10,81 +10,42 @@ subtitle: Using lava flow morphology and mass wasting scars to determine if Empa
   The Galapagos Spreading Center is a uniquely complex setting where the Nazca and Cocos plates meet within 100km of the Galapagos Hotspot. This study will look at the seamount Emapanada(2º6’N 92ºW) which is located on the Galapagos Spreading Center, off the coast of Ecuador. I hypothesis that Empanada experienced mass-wasting concurrent to its construction rather than exclusively after it. To test this hypothesis, I will model the emplacement of each seamount based on its observed and mapped lava morphologies, and changes in flank slope. The assessment will include maps of each seamount’s morphology based on previously collected dive video/pictures.
 
 # Materials and methods
-
-Narrative and most code will go here.  Describe what you are doing and show how to do it (with code).
-
-You can do bullets like this:
-
-* The first most important thing
-* The second most important thing
-* The third most important thing
-
-You can do numbers like this:
-
-1. The first most important thing
-2. The second most important thing
-3. The third most important thing
-
-See [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/) for all the amazing things you can do.
-
-
-Here's my first code chunk.
-```{r}
-1+2
+1. load requied packages (you may need to install some of them)
+```{r, message=F, echo=T}
+library(ncdf4) # package for netcdf manipulation
+library(raster) # package for raster manipulation
+library(rgdal) # package for geospatial analysis
+library(ggplot2) # package for plotting
+library(plot3D) #package for 3D plotting
 ```
 
-Load any required packages in a code chunk (you may need to install some packages):
+2. open the raster file and assign it to an object
 
-```{r, message=F, warning=F}
-library(tidyverse)
-library(leaflet)
-library(kableExtra)
-knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
+```{r, echo=T}
+sm <- raster("dsa2_2m.grd")
+```
+
+3. crop the raster object to the extent of the seamount
+
+```{r, echo=T}
+sm_crop <- crop(sm, extent(615000, 618000, 232000, 234000))
+```
+
+4. take a look at empanada
+
+```{r, echo=F}
+plot(sm_crop)
 ```
 
 ## Download and clean all required data
-```{r}
-n=20
-data=data.frame(x=runif(n,-180,180),
-                y=runif(n,-60,60),
-                size = runif(n, 5, 20),
-                category = factor(
-                  sample(letters[1:5], n, replace = TRUE)
-                  ),
-                value = rnorm(n))
-```
 
-```{r, results='asis'}
-data %>% 
-  slice(1:10) %>% #show only 1:n rows
-  kable(digits=2,align="c")%>% #make table and round to two digits
-  kable_styling(bootstrap_options = 
-                  c("striped", "hover", "condensed", "responsive")) #apply other formatting
-```
-
-Add any additional processing steps here.
 
 # Results
 
 Show tables, plots, etc. and describe them.
 
-```{r, fig.width=6, fig.height=3, fig.cap="Map of completely random data"}
-m <- leaflet(data) %>% 
-  addTiles() %>% 
-  addCircleMarkers(~x, ~y, radius = ~size,color = ~as.factor(category)) %>% 
-  addPopups(~x[2], ~y[2], "Random popup")
-m  # a map with the default OSM tile layer
-```
-
-
-```{r}
-data %>% 
-  ggplot(aes(x=x,y=y,col=category))+
-  geom_point()
-```
 
 # Conclusions
 
-What have you learned?  Are there any broader implications?
 
 # References
