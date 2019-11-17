@@ -4,13 +4,13 @@ author: Katlyn Sewell
 subtitle: Using lava flow morphology and mass wasting scars to determine if Empanada fell apart while it was being built  
 ---
 
-# Introduction
- Seamounts are oceanic volcanoes that form at nearly all seafloor tectonic settings. As oceanic plates are pulled apart, fissures form and eruptions of basaltic melt derived from decompression melting of the mantle occur. Over the course of hours to days, magmatic eruptions are focused in the center of the fissure because the thinner ends cool more rapidly. As the lava from this focused erutpion cools it builds the flanks of the seamount. Mass-wasting events are recorded in the morphology of seamounts as amphitheater shaped head scarps, talus, and erosive channels. Very few seamounts have been observed during construction, largely due to their remote location at the seafloor and difficulty detecting an erupting seamount from the surface. For these reasons much of their construction and deconstruction is based on scientific assumptions.  
+# Introduction 
+ Seamounts are oceanic volcanoes that form at nearly all seafloor tectonic settings. As oceanic plates are pulled apart, fissures form and eruptions of basaltic melt derived from decompression melting of the mantle occur. Over the course of hours to days, magmatic eruptions are focused in the center of the fissure because the thinner ends cool more rapidly. As the lava from this focused eruption cools it builds the flanks of the seamount. Mass-wasting events are recorded in the morphology of seamounts as amphitheater shaped head scarps, talus, and erosive channels. Very few seamounts have been observed during construction, largely due to their remote location at the seafloor and difficulty detecting an erupting seamount from the surface. For these reasons much of their construction and deconstruction is based on scientific assumptions.  
   
-  The Galapagos Spreading Center is a uniquely complex setting where the Nazca and Cocos plates meet within 100km of the Galapagos Hotspot. This study will look at the seamount Emapanada(2º6’N 92ºW) which is located on the Galapagos Spreading Center, off the coast of Ecuador. I hypothesis that Empanada experienced mass-wasting concurrent to its construction rather than exclusively after it. To test this hypothesis, I will model the emplacement of each seamount based on its observed and mapped lava morphologies, and changes in flank slope. The assessment will include maps of each seamount’s morphology based on previously collected dive video/pictures.
+  The Galapagos Spreading Center is a uniquely complex setting where the Nazca and Cocos plates meet within 100km of the Galapagos Hotspot. This study will look at the seamount Emapanada (2º6’N 92ºW) which is located on the Galapagos Spreading Center, off the coast of Ecuador. I hypothesis that Empanada experienced mass-wasting concurrent to its construction rather than exclusively after it. To test this hypothesis, I will model the emplacement of each seamount based on its observed and mapped lava morphologies, and changes in flank slope. The assessment will include maps of each seamount’s morphology based on previously collected dive video/pictures.
 
-# Materials and methods
-1. load requied packages (you may need to install some of them)
+# Materials and methods 
+1. Load required packages (you may need to install some of them)
 ```{r, message=F, echo=T}
 library(ncdf4) # package for netcdf manipulation
 library(raster) # package for raster manipulation
@@ -19,33 +19,33 @@ library(ggplot2) # package for plotting
 library(plot3D) #package for 3D plotting
 ```
 
-2. open the raster file and assign it to an object
+2. Open the raster file and assign it to an object
 
 ```{r, echo=T}
 sm <- raster("dsa2_2m.grd")
 ```
 
-3. crop the raster object to the extent of the seamount
+3. Crop the raster object to the extent of the seamount
 
 ```{r, echo=T}
 sm_crop <- crop(sm, extent(615000, 618000, 232000, 234000))
 ```
 
-4. take a look at empanada
+4. Take a look at empanada
 
 ```{r, echo=F}
 plot(sm_crop)
 ```
 
-## Download and clean all required data
+## Download and clean all required data 
 
 
-# Results
+# Results 
 
 Show tables, plots, etc. and describe them.
 
 
-# Conclusions
+# Conclusions 
 
 
 # References
