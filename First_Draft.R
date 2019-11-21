@@ -1,16 +1,23 @@
-library(ncdf4) # package for netcdf manipulation
+library(plotly)
 library(raster) # package for raster manipulation
 library(rgdal) # package for geospatial analysis
 library(ggplot2) # package for plotting
-library(plot3D) #package for 3D plotting
+library(data.table)
 
-sm <- raster("dsa2_2m.grd")
 
-sm_crop <- crop(sm, extent(615000, 618000, 232000, 234000))
+sm <- raster("data/empanada_clip.tif")*(-1)
 
-elev <- as.matrix(sm_crop$z)
+sm_matrix <- as.matrix(sm)
+rownames(sm_matrix) <- c(232000:233001)
+colnames(sm_matrix) <- c(615000:616502)
 
-sm_matrix <- as.matrix(sm_crop) 
 
-empanada <- persp3D(x=sm_matrix, y=sm_matrix, z=elev)
+plot(sm)
+  
 
+plot_ly(z= ~sm_matrix) %>% 
+  add_surface() %>% 
+  layout(scene= list(aspectmode='manual',
+                     aspectratio = list(x=1, y=1, z=0.25)))
+
+  
