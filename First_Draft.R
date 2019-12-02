@@ -16,12 +16,12 @@ sm_rough=terrain(sm,opt="roughness")
 
 sm_matrix <- as.matrix(sm) #don't need?
 
-emp1 <- gplot(sm_rough>8,maxpixels=1e5) +
+emp1 <- gplot(sm) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c()
  
-emp1 + geom_sf(data=dive_4607_sf, inherit.aes = F,col="red" )+
-  coord_cartesian(xlim=
+emp1 + geom_sf(data=dive_4607_sf, inherit.aes = F,col="red" )
+  
  
 sm_df=as.data.frame(sm)
 
@@ -31,11 +31,21 @@ dive_4607_sf <- read.csv("data/sm_track.csv")%>%
   na.omit() %>%
   st_as_sf(coords=c("Easting", "Northing")) %>%
   st_set_crs("+proj=utm +zone=15 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
-  
+ 
+#roughness
+emp1 <- gplot(sm_rough>8,maxpixels=1e5) +
+  geom_tile(aes(fill=value))+
+  scale_fill_viridis_c()
+ 
 
+
+
+#just fancy looking don't use for analysis
 plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>% 
-  add_surface() %>% 
-  add_markers(data=dive_4607, x=st_coordinates(dive_4607[, 1]), y=st_coordinates(dive_4607[,2]))
+  add_surface() %>%
   layout(scene= list(aspectmode='manual',
                      aspectratio = list(x=1, y=1, z=0.25)))
+# pipe in if I can figure out how (before layout)
+  add_markers(data=dive_4607, x=st_coordinates(dive_4607[, 1]), y=st_coordinates(dive_4607[,2]))
+  
 
