@@ -111,8 +111,9 @@ emp6
 
 12. the next step is to compare what the program has picked out to the observations the researchers made. Let's start by plotting their dive track
 
-
-
+```{r, echo=T, cache=T}
+emp6 + dive_track
+```
 # Results
 
 Show tables, plots, etc. and describe them.
