@@ -30,7 +30,7 @@ dive_4607_sf <- read.csv("data/sm_track.csv")%>%
 
 sm_matrix <- as.matrix(sm) #don't need?
 
-dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red")
+dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red", size=0.5)
 #emp1=map of sentry data
 emp1 <- gplot(sm) +
   geom_tile(aes(fill=value))+

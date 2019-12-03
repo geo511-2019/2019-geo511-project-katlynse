@@ -72,7 +72,7 @@ dive_4607_sf <- read.csv("data/sm_track.csv")%>%
 
 7. Add the dive track to the 2D map
 ```{r, echo=T, cache=T}
-dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red")
+dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red", size=0.5)
 emp2 <- emp1 + dive_track
 ```
 
