@@ -122,3 +122,5 @@ Show tables, plots, etc. and describe them.
 
 
 # References
+http://www.soest.hawaii.edu/gruvee/
+http://www.marine-geo.org/tools/search/Files.php?data_set_uid=9464
