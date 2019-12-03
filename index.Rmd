@@ -11,33 +11,48 @@ subtitle: Using lava flow morphology and mass wasting scars to determine if Empa
 
 # Materials and methods
 1. load requied packages (you may need to install some of them)
-```{r, message=F, echo=T}
-library(ncdf4) # package for netcdf manipulation
+```{r, message=F, echo=T, cache=T}
+library(plotly) #3d plot
 library(raster) # package for raster manipulation
 library(rgdal) # package for geospatial analysis
 library(ggplot2) # package for plotting
-library(plot3D) #package for 3D plotting
+library(data.table)
+library(readxl) #read excel file
+library(sf)
+library(rasterVis)
 ```
 
-2. open the raster file and assign it to an object
+2. open the raster file and assign it to an object, but wait! These z values are actually depths(distance below sea level) not elevation (distance above sea level) so we need to multiple the z values by -1 to plot accurately.
 
-```{r, echo=T}
-sm <- raster("dsa2_2m.grd")
+```{r, echo=T, cache=TRUE}
+sm <- raster("data/empanada_clip.tif")*(-1)
 ```
 
-3. crop the raster object to the extent of the seamount
+3. Empanada is in UTM Zone 15N so we will assign it the proper projection
 
-```{r, echo=T}
-sm_crop <- crop(sm, extent(615000, 618000, 232000, 234000))
+```{r, echo=T, cache=TRUE}
+proj="+proj=utm +zone=15 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+projection(sm)=proj
 ```
 
-4. take a look at empanada
+4. Lets take a quick look at empanada
 
-```{r, echo=F}
-plot(sm_crop)
+```{r, echo=F, cache=T}
+emp1 <- gplot(sm) +
+  geom_tile(aes(fill=value))+
+  scale_fill_viridis_c()
+emp1
 ```
 
-## Download and clean all required data
+5. Let's take a fancy look at Empanada
+```{r, echo= F, cache=T}
+sm_matrix <- as.matrix(sm)
+plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>% 
+  add_surface() %>%
+  layout(scene= list(aspectmode='manual',
+                     aspectratio = list(x=1, y=1, z=0.25)))
+```
+Super cool, but a bit too fancy for this programmer so we'll work with the 2D map and refer back to the 3D
 
 
 # Results
