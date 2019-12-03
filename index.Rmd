@@ -1,7 +1,7 @@
 ---
 title: The Construction and Deconstruction of Empanada
 author: Katlyn Sewell
-subtitle: Using lava flow morphology and mass wasting scars to determine if Empanada fell apart while it was being built  
+subtitle: Using lava flow morphology and mass wasting scars to determine if Empanada fell apart while it was being built 
 ---
 
 # Introduction
@@ -53,6 +53,64 @@ plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>%
                      aspectratio = list(x=1, y=1, z=0.25)))
 ```
 Super cool, but a bit too fancy for this programmer so we'll work with the 2D map and refer back to the 3D
+
+The GRUVEE team that collected the sentry data also took a submarine over Empanada and recorded their observations. These observaitons are available for download on their website: http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/gruvee-divereports.html 
+![Map of dive track\label{figurelabel}](img/4607_Dive_map copy.jpg)
+  
+  6a. convert csv  
+  6b. omit blanks   
+  6c. convert to sf  
+  6d. set the crs to match the sentry data  
+
+```{r, echo=TRUE, cache=TRUE}
+dive_4607 <- read.csv("data/sm_track.csv")
+dive_4607_sf <- read.csv("data/sm_track.csv")%>%
+  na.omit() %>%
+  st_as_sf(coords=c("Easting", "Northing")) %>%
+  st_set_crs(proj)
+```
+
+7. Add the dive track to the 2D map
+```{r, echo=T, cache=T}
+dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red")
+emp2 <- emp1 + dive_track
+```
+
+8. Let's take another look
+```{r, echo=T, cache=T}
+emp2
+```
+
+9. The GRUVEE team only recorded observations at these points but we are interested in the entire seamount. Mass-wasting produces talus (broken up rocks) so let's look at the rough areas of Empanada
+```{r, echo=T, cache=T}
+sm_rough=terrain(sm,opt="roughness")
+emp3 <- gplot(sm_rough,maxpixels=1e5) +
+  geom_tile(aes(fill=value))+
+  scale_fill_viridis_c()
+emp3
+```
+
+10. Mass-wasting scarps are steep aphitheatre shaped cliffs so let's look at the slopes on Empanada.
+```{r, echo=T, cache=T}
+sm_slope=terrain(sm,opt="slope",unit="degrees")
+emp5 <- gplot(sm_slope,maxpixels=1e5) +
+  geom_tile(aes(fill=value))+
+  scale_fill_viridis_c() 
+emp5
+```
+
+11. Nice, but let's focus on just the more extreme slopes to remove the edges of the lava flows and leave us with breaks.
+
+```{r, echo=T, cache=T}
+sm_slope=terrain(sm,opt="slope",unit="degrees")
+emp6 <- gplot(sm_slope>40,maxpixels=1e5) +
+  geom_tile(aes(fill=value))+
+  scale_fill_viridis_c()
+emp6
+```
+
+12. the next step is to compare what the program has picked out to the observations the researchers made. Let's start by plotting their dive track
+
 
 
 # Results
