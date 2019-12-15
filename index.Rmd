@@ -7,10 +7,12 @@ subtitle: Using lava flow morphology and mass wasting scars to determine if Empa
 # Introduction
  Seamounts are oceanic volcanoes that form at nearly all seafloor tectonic settings. As oceanic plates are pulled apart, fissures form and eruptions of basaltic melt derived from decompression melting of the mantle occur. Over the course of hours to days, magmatic eruptions are focused in the center of the fissure because the thinner ends cool more rapidly. As the lava from this focused erutpion cools it builds the flanks of the seamount. Mass-wasting events are recorded in the morphology of seamounts as amphitheater shaped head scarps, talus, and erosive channels. Very few seamounts have been observed during construction, largely due to their remote location at the seafloor and difficulty detecting an erupting seamount from the surface. For these reasons much of their construction and deconstruction is based on scientific assumptions.  
   
-  The Galapagos Spreading Center is a uniquely complex setting where the Nazca and Cocos plates meet within 100km of the Galapagos Hotspot. This study will look at the seamount Emapanada(2º6’N 92ºW) which is located on the Galapagos Spreading Center, off the coast of Ecuador. I hypothesis that Empanada experienced mass-wasting concurrent to its construction rather than exclusively after it. To test this hypothesis, I will model the emplacement of each seamount based on its observed and mapped lava morphologies, and changes in flank slope. The assessment will include maps of each seamount’s morphology based on previously collected dive video/pictures.
+  The Galapagos Spreading Center is a uniquely complex setting where the Nazca and Cocos plates meet within 100km of the Galapagos Hotspot. This study will look at the seamount Emapanada(2º6’N 92ºW) which is located on the Galapagos Spreading Center, off the coast of Ecuador. I hypothesis that Empanada experienced mass-wasting concurrent to its construction rather than exclusively after it. To test this hypothesis, I will look for changes in flank slope. The assessment will include a map of Empanada's morphology based on previously collected dive video/pictures.
+  
+  Ultimately, this project seeks to determine where Empanada has experienced mass-wasting.
 
-# Materials and methods
-1. load requied packages (you may need to install some of them)
+# Materials and Methods
+1. Load requied packages (you may need to install some of them)
 ```{r, message=F, echo=T, cache=T}
 library(plotly) #3d plot
 library(raster) # package for raster manipulation
@@ -19,109 +21,176 @@ library(ggplot2) # package for plotting
 library(data.table)
 library(readxl) #read excel file
 library(sf)
+library(sp) #converting lat long to utm
 library(rasterVis)
+library(rio) #convert excel to csv
+library(docxtractr) # reads .doc 
+library(tidyr) #used to split column into 2 columns
+library(measurements) #convert deg min to decimal
+library(jpeg) #read jpeg
 ```
+2. Before we get to far it's important to know what projection we need to use. Empanada is in UTM Zone 15N so we will assign it the proper projection.
 
-2. open the raster file and assign it to an object, but wait! These z values are actually depths(distance below sea level) not elevation (distance above sea level) so we need to multiple the z values by -1 to plot accurately.
+```{r, echo=T, cache=TRUE}
+proj="+proj=utm +zone=15 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
+projection(sm)=proj
+``` 
+
+3. Download the port transcript for dive 4607 from the GRUVEE website. This excel sheet contains mass-wasting and lava morphology observations, as well as the X, Y positions where the observations were made.
+```{r, message=F, echo=TRUE, cache=TRUE}
+dive_report <- "http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/4607/Diver_Reports/4607_Port_transcript.xls"
+```
+3. Convert the .xls to .csv and read in the .csv
+```{r, message=FALSE, echo=TRUE, cache=TRUE}
+dive_report <- convert(dive_report, "dive_report.csv")
+dive_4607 <- read.csv(dive_report)
+```
+4. The coordinates in the csv are a shorthand used by the GRUVEE crew rather than real coordinates. First we must calculate the conversion factor between the X, Y values and standard UTM.
+```{r, message=FALSE, echo=TRUE, cache=TRUE}
+#4a Download the smaple collection file which contains X, Y and true coordinates from the GRUVEE website.
+coordurl <- "http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/4607/Diver_Reports/4607_Sample_table.doc"
+coord <- read_docx(coordurl) #must have LibreOffice installed
+
+#4b Now that you have a document with true coordinates and X, Y manually copy and paste the table into an excel file so you can work with it in R, I have included my ecxel file in the data folder. In this step ensure that the table copied correctly and has the same number of rows and columns as the original.
+
+#4c Read in the new excel file
+coord_excel <- read_xlsx("data/coord_excel.xlsx")
+
+#4d Seperate the latitude from the longitude
+coord_split <- separate(coord_excel, "Lat, Long", c("Lat", "Long"), sep = "[,]")
+
+#4e Convert the degree lat long into UTM; while I'm certain there is a way to do this in R, this programer was not able to discover it. Therefore you must use an outside site to convert the degrees to UTM, I used this site: http://www.rcn.montana.edu/resources/converter.aspx 
+coord_split$Easting <- c(615760, 615809, 616218, 615848, 615918, 616063, 616180, 616302)
+coord_split$Northing <- c(235171, 235154, 234317, 234133, 233736, 233416, 233151, 232770)
+
+#4f Find the conversion factor to get from X to Easting and Y to Northing
+## We know X + some# = Easting so Easting-X=conversion factor
+coord_split[1, "Easting"] - coord_split[1, "X"]
+
+## and Northing-Y=conversion factor
+coord_split[1, "Northing"] - coord_split[1, "Y"]
+
+## We can double check to make sure our conversion returns the correct values for all points
+mutate(coord_split, dbl_x= X + 600078)
+mutate(coord_split, dbl_y= Y + 224781)
+#Looks good! 
+```
+5. Use the conversion factors to convert the X, Y positions from the dive 4607 transcript to standard UTM
+```{r, message=F, echo=T}
+names(dive_4607) <- lapply(dive_4607[8, ], as.character) #correct column names
+dive_4607 <- dive_4607[-c(1:8),] #remove spaces and non observation info
+names(dive_4607)[7]<-"Samples" #add column name to the samples column
+dive_4607[, "X"] <- as.numeric(as.character(dive_4607[, "X"])) #change X, Y class from factor to numeric
+dive_4607[, "Y"] <- as.numeric(as.character(dive_4607[, "Y"] ))
+dive_4607 <- mutate(dive_4607, Easting= X + 600078) #convert X, Y Easting and Northing as new columns
+dive_4607 <- mutate(dive_4607, Northing= Y + 224781)
+
+write.csv(dive_4607, file = "data/dive_4607.csv") #write this new table to a .csv file
+```
+6. Get the data ready to plot
+```{r, echo=TRUE, cache=TRUE, message=F}
+dive_4607 <- read.csv("data/dive_4607.csv")
+dive_4607_sf <- read.csv("data/dive_4607.csv")%>%
+  drop_na(Easting) %>% #get rid of NA values from the Easting column
+  st_as_sf(coords=c("Easting", "Northing")) %>% #set the coordinates
+  st_set_crs(proj) #set the projection
+
+dive_crop <- st_crop(dive_4607_sf, xmin= 615000, xmax= 618000, ymin= 232000, ymax= 234000) #crop to show just the points over empanada
+```
+7. Get the raster. The raster file used in this project used to be available online at http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/gruvee-sentry-deployments.html; however, the website has broken and due to lack of interest the moderator, Scott White, has decided it's not worth fixing. He is more than happy to send the data to any interested scientists upon email request. You may reach him at swhite@geol.sc.edu. For this reason, I have included the raster used in the data file rather than provide code to download it directly. 
+
+8. Open the raster file and assign it to an object. The z values are actually depths(distance below sea level) rather than elevation (distance above sea level) so we need to multiple the z values by -1 to plot accurately.
 
 ```{r, echo=T, cache=TRUE}
 sm <- raster("data/empanada_clip.tif")*(-1)
 ```
 
-3. Empanada is in UTM Zone 15N so we will assign it the proper projection
-
-```{r, echo=T, cache=TRUE}
-proj="+proj=utm +zone=15 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
-projection(sm)=proj
-```
-
-4. Lets take a quick look at empanada
+9. Plot the raster
 
 ```{r, echo=F, cache=T}
 emp1 <- gplot(sm) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c()
-emp1
-```
 
-5. Let's take a fancy look at Empanada
-```{r, echo= F, cache=T}
+```
+10. Add the dive track to the 2D map
+```{r, echo=T, cache=T}
+dive_track <- geom_sf(data=dive_crop, inherit.aes = F,col="red", size=0.5, mapping=aes())
+emp2 <- emp1 + dive_track
+```
+11. Take a look
+```{r, echo=T, cache=T}
+emp2
+```
+12. To be sure our points are accurate we should refernce the dive map posted by the GRUVEE team
+```{r, echo=T, message=F, cache=T}
+mapurl="http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/4607/Diver_Reports/4607_Dive_map.jpg"
+download.file(mapurl, 'dive_map.jpg', mode = 'wb')
+plot_jpeg = function(path, add=FALSE)
+{
+  require('jpeg')
+  jpg = readJPEG(path, native=T) # read the file
+  res = dim(jpg)[2:1] # get the resolution, [x, y]
+  if (!add) # initialize an empty plot area if add==FALSE
+    plot(1,1,xlim=c(1,res[1]),ylim=c(1,res[2]),asp=1,type='n',xaxs='i',yaxs='i',xaxt='n',yaxt='n',xlab='',ylab='',bty='n')
+  rasterImage(jpg,1,1,res[1],res[2])
+}
+plot_jpeg('dive_map.jpg')
+
+```
+Our points look good!
+
+Before we move on to the analysis let's take a look at a 3-D plot of Empanada just to get a good feel for what we're working with.
+```{r, echo= T, cache=T}
 sm_matrix <- as.matrix(sm)
 plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>% 
   add_surface() %>%
   layout(scene= list(aspectmode='manual',
-                     aspectratio = list(x=1, y=1, z=0.25)))
+                     aspectratio = list(x=1, y=1, z=0.2)))
 ```
-Super cool, but a bit too fancy for this programmer so we'll work with the 2D map and refer back to the 3D
+This certainly a useful visualization tool but a bit too fancy for this programmer to work with so we'll analyze the 2D map and use the 3-D for reference.
 
-The GRUVEE team that collected the sentry data also took a submarine over Empanada and recorded their observations. These observaitons are available for download on their website: http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/gruvee-divereports.html 
-![Map of dive track\label{figurelabel}](img/4607_Dive_map copy.jpg)
-  
-  6a. convert csv  
-  6b. omit blanks   
-  6c. convert to sf  
-  6d. set the crs to match the sentry data  
+#Results
+Tables and figures (maps and other graphics) are carefully planned to convey the results of your analysis. Intense exploration and evidence of many trials and failures. The author looked at the data in many different ways before coming to the final presentation of the data
 
-```{r, echo=TRUE, cache=TRUE}
-dive_4607 <- read.csv("data/sm_track.csv")
-dive_4607_sf <- read.csv("data/sm_track.csv")%>%
-  na.omit() %>%
-  st_as_sf(coords=c("Easting", "Northing")) %>%
-  st_set_crs(proj)
-```
-
-7. Add the dive track to the 2D map
-```{r, echo=T, cache=T}
-dive_track <- geom_sf(data=dive_4607_sf, inherit.aes = F,col="red", size=0.5, mapping=aes())
-emp2 <- emp1 + dive_track
-```
-
-8. Let's take another look
-```{r, echo=T, cache=T}
-emp2
-```
-
-9. The GRUVEE team only recorded observations at these points but we are interested in the entire seamount. Mass-wasting produces talus (broken up rocks) so let's look at the rough areas of Empanada
+9. The GRUVEE team only recorded observations along the points along the dive track but we are interested in the entire seamount. Mass-wasting produces talus (broken up rocks) so let's look at the rough areas of Empanada.
 ```{r, echo=T, cache=T}
 sm_rough=terrain(sm,opt="roughness")
-emp3 <- gplot(sm_rough,maxpixels=1e5) +
+rough <- gplot(sm_rough,maxpixels=1e5) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c()
-emp3
+rough + dive_track
 ```
 
 10. Mass-wasting scarps are steep aphitheatre shaped cliffs so let's look at the slopes on Empanada.
 ```{r, echo=T, cache=T}
-sm_slope=terrain(sm,opt="slope",unit="degrees")
-emp5 <- gplot(sm_slope,maxpixels=1e5) +
+sm_slope=terrain(sm, opt="slope",unit="degrees")
+slope <- gplot(sm_slope,maxpixels=1e5) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c() 
-emp5
+slope + dive_track
 ```
 
 11. Nice, but let's focus on just the more extreme slopes to remove the edges of the lava flows and leave us with breaks.
 
 ```{r, echo=T, cache=T}
 sm_slope=terrain(sm,opt="slope",unit="degrees")
-emp6 <- gplot(sm_slope>40,maxpixels=1e5) +
+slope2 <- gplot(sm_slope>40,maxpixels=1e5) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c()
-emp6
+slope2 + dive_track
 ```
 
 12. the next step is to compare what the program has picked out to the observations the researchers made. Let's start by plotting their dive track
 
 ```{r, echo=T, cache=T}
-emp6 + dive_track
+slope2 + dive_track
 ```
-# Results
-
-Show tables, plots, etc. and describe them.
-
 
 # Conclusions
-
+Clear summary adequately describing the results and putting them in context. Discussion of further questions and ways to continue investigation
 
 # References
 http://www.soest.hawaii.edu/gruvee/
 http://www.marine-geo.org/tools/search/Files.php?data_set_uid=9464
+https://stackoverflow.com/questions/9543343/plot-a-jpg-image-using-base-graphics-in-r
