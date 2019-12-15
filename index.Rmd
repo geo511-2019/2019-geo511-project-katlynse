@@ -29,7 +29,16 @@ library(tidyr) #used to split column into 2 columns
 library(measurements) #convert deg min to decimal
 library(jpeg) #read jpeg
 ```
-2. Before we get to far it's important to know what projection we need to use. Empanada is in UTM Zone 15N so we will assign it the proper projection.
+
+7. Get the raster. The raster file used in this project used to be available online at http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/gruvee-sentry-deployments.html; however, the website has broken and due to lack of interest the moderator, Scott White, has decided it's not worth fixing. He is more than happy to send the data to any interested scientists upon email request. You may reach him at swhite@geol.sc.edu. For this reason, I have included the raster used in the data file rather than provide code to download it directly. 
+
+8. Open the raster file and assign it to an object. The z values are actually depths(distance below sea level) rather than elevation (distance above sea level) so we need to multiply the z values by -1 to plot accurately.
+
+```{r, echo=T, cache=TRUE}
+sm <- raster("data/empanada_clip.tif")*(-1)
+```
+
+2. Before we get too far it's important to know what projection we need to use. Empanada is in UTM Zone 15N so we will assign it the proper projection.
 
 ```{r, echo=T, cache=TRUE}
 proj="+proj=utm +zone=15 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
@@ -47,11 +56,11 @@ dive_4607 <- read.csv(dive_report)
 ```
 4. The coordinates in the csv are a shorthand used by the GRUVEE crew rather than real coordinates. First we must calculate the conversion factor between the X, Y values and standard UTM.
 ```{r, message=FALSE, echo=TRUE, cache=TRUE}
-#4a Download the smaple collection file which contains X, Y and true coordinates from the GRUVEE website.
+#4a Download the sample collection file which contains X, Y and true coordinates from the GRUVEE website.
 coordurl <- "http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/4607/Diver_Reports/4607_Sample_table.doc"
 coord <- read_docx(coordurl) #must have LibreOffice installed
 
-#4b Now that you have a document with true coordinates and X, Y manually copy and paste the table into an excel file so you can work with it in R, I have included my ecxel file in the data folder. In this step ensure that the table copied correctly and has the same number of rows and columns as the original.
+#4b Now that you have a document with true coordinates and X, Y manually copy and paste the table into an excel file so you can work with it in R; I have included my ecxel file in the data folder. In this step, ensure that the table copied correctly and has the same number of rows and columns as the original.
 
 #4c Read in the new excel file
 coord_excel <- read_xlsx("data/coord_excel.xlsx")
@@ -59,7 +68,7 @@ coord_excel <- read_xlsx("data/coord_excel.xlsx")
 #4d Seperate the latitude from the longitude
 coord_split <- separate(coord_excel, "Lat, Long", c("Lat", "Long"), sep = "[,]")
 
-#4e Convert the degree lat long into UTM; while I'm certain there is a way to do this in R, this programer was not able to discover it. Therefore you must use an outside site to convert the degrees to UTM, I used this site: http://www.rcn.montana.edu/resources/converter.aspx 
+#4e Convert the degree lat long into UTM. While I'm certain there is a way to do this in R, this programer was not able to discover it. Therefore, you must use an outside site to convert the degrees to UTM. I used this site: http://www.rcn.montana.edu/resources/converter.aspx 
 coord_split$Easting <- c(615760, 615809, 616218, 615848, 615918, 616063, 616180, 616302)
 coord_split$Northing <- c(235171, 235154, 234317, 234133, 233736, 233416, 233151, 232770)
 
@@ -75,39 +84,42 @@ mutate(coord_split, dbl_x= X + 600078)
 mutate(coord_split, dbl_y= Y + 224781)
 #Looks good! 
 ```
-5. Use the conversion factors to convert the X, Y positions from the dive 4607 transcript to standard UTM
+5. Use the conversion factors to convert the X, Y positions from the dive 4607 transcript to standard UTM. A few aspects of our table need to be corrected before we can do this.
 ```{r, message=F, echo=T}
-names(dive_4607) <- lapply(dive_4607[8, ], as.character) #correct column names
-dive_4607 <- dive_4607[-c(1:8),] #remove spaces and non observation info
-names(dive_4607)[7]<-"Samples" #add column name to the samples column
-dive_4607[, "X"] <- as.numeric(as.character(dive_4607[, "X"])) #change X, Y class from factor to numeric
+#5a. Correct the column names
+names(dive_4607) <- lapply(dive_4607[8, ], as.character) 
+
+#5b. Remove the rows that do not contain observations
+dive_4607 <- dive_4607[-c(1:8),] 
+
+#5c. Add a column name to the samples column
+names(dive_4607)[7]<-"Samples" 
+
+#5d. Change the class of X and Y from factor to numeric
+dive_4607[, "X"] <- as.numeric(as.character(dive_4607[, "X"])) 
 dive_4607[, "Y"] <- as.numeric(as.character(dive_4607[, "Y"] ))
-dive_4607 <- mutate(dive_4607, Easting= X + 600078) #convert X, Y Easting and Northing as new columns
+
+#5e. Convert X and Y to accurate Easting and Northing as new columns
+dive_4607 <- mutate(dive_4607, Easting= X + 600078) 
 dive_4607 <- mutate(dive_4607, Northing= Y + 224781)
 
-write.csv(dive_4607, file = "data/dive_4607.csv") #write this new table to a .csv file
+#5f. Write this new table to a .csv file
+write.csv(dive_4607, file = "data/dive_4607.csv") 
 ```
 6. Get the data ready to plot
-```{r, echo=TRUE, cache=TRUE, message=F}
-dive_4607 <- read.csv("data/dive_4607.csv")
-dive_4607_sf <- read.csv("data/dive_4607.csv")%>%
-  drop_na(Easting) %>% #get rid of NA values from the Easting column
+```{r, echo=TRUE, cache=TRUE, message=F, warning=F}
+dive_4607_sf <- read.csv("data/dive_4607.csv")%>% #read in the .csv file
+  drop_na(Easting) %>% #get rid of rows with NA values in the Easting column
   st_as_sf(coords=c("Easting", "Northing")) %>% #set the coordinates
   st_set_crs(proj) #set the projection
 
 dive_crop <- st_crop(dive_4607_sf, xmin= 615000, xmax= 618000, ymin= 232000, ymax= 234000) #crop to show just the points over empanada
 ```
-7. Get the raster. The raster file used in this project used to be available online at http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/gruvee-sentry-deployments.html; however, the website has broken and due to lack of interest the moderator, Scott White, has decided it's not worth fixing. He is more than happy to send the data to any interested scientists upon email request. You may reach him at swhite@geol.sc.edu. For this reason, I have included the raster used in the data file rather than provide code to download it directly. 
 
-8. Open the raster file and assign it to an object. The z values are actually depths(distance below sea level) rather than elevation (distance above sea level) so we need to multiple the z values by -1 to plot accurately.
-
-```{r, echo=T, cache=TRUE}
-sm <- raster("data/empanada_clip.tif")*(-1)
-```
 
 9. Plot the raster
 
-```{r, echo=F, cache=T}
+```{r, echo=T, cache=T}
 emp1 <- gplot(sm) +
   geom_tile(aes(fill=value))+
   scale_fill_viridis_c()
@@ -122,11 +134,12 @@ emp2 <- emp1 + dive_track
 ```{r, echo=T, cache=T}
 emp2
 ```
+
 12. To be sure our points are accurate we should refernce the dive map posted by the GRUVEE team
 ```{r, echo=T, message=F, cache=T}
 mapurl="http://www.soest.hawaii.edu/gruvee/sci/Alvin_Dives/4607/Diver_Reports/4607_Dive_map.jpg"
 download.file(mapurl, 'dive_map.jpg', mode = 'wb')
-plot_jpeg = function(path, add=FALSE)
+plot_jpeg = function(path, add=FALSE) #referenced from stackexchange (see references)
 {
   require('jpeg')
   jpg = readJPEG(path, native=T) # read the file
@@ -138,9 +151,11 @@ plot_jpeg = function(path, add=FALSE)
 plot_jpeg('dive_map.jpg')
 
 ```
+
 Our points look good!
 
-Before we move on to the analysis let's take a look at a 3-D plot of Empanada just to get a good feel for what we're working with.
+
+Before we move on to the analysis let's take a look at a 3-D plot of Empanada, just to get a good feel for what we're working with.
 ```{r, echo= T, cache=T}
 sm_matrix <- as.matrix(sm)
 plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>% 
@@ -150,7 +165,7 @@ plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>%
 ```
 This certainly a useful visualization tool but a bit too fancy for this programmer to work with so we'll analyze the 2D map and use the 3-D for reference.
 
-#Results
+# Results  
 Tables and figures (maps and other graphics) are carefully planned to convey the results of your analysis. Intense exploration and evidence of many trials and failures. The author looked at the data in many different ways before coming to the final presentation of the data
 
 9. The GRUVEE team only recorded observations along the points along the dive track but we are interested in the entire seamount. Mass-wasting produces talus (broken up rocks) so let's look at the rough areas of Empanada.
@@ -191,6 +206,7 @@ slope2 + dive_track
 Clear summary adequately describing the results and putting them in context. Discussion of further questions and ways to continue investigation
 
 # References
-http://www.soest.hawaii.edu/gruvee/
-http://www.marine-geo.org/tools/search/Files.php?data_set_uid=9464
-https://stackoverflow.com/questions/9543343/plot-a-jpg-image-using-base-graphics-in-r
+http://www.rcn.montana.edu/resources/converter.aspx  
+http://www.soest.hawaii.edu/gruvee/  
+http://www.marine-geo.org/tools/search/Files.php?data_set_uid=9464  
+https://stackoverflow.com/questions/9543343/plot-a-jpg-image-using-base-graphics-in-r  
