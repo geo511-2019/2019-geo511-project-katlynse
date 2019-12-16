@@ -85,8 +85,7 @@ coord_split[1, "Northing"] - coord_split[1, "Y"]
 ## We can double check to make sure our conversion returns the correct values for all points
 coord_split <- mutate(coord_split, dbl_x= X + 600078)
 coord_split <- mutate(coord_split, dbl_y= Y + 224781)
-select(coord_split, Easting, Northing, dbl_x, dbl_y)
-
+dplyr::select(coord_split, Easting, Northing, dbl_x, dbl_y)
 #Looks good! 
 ```
 8. Use the conversion factors to convert the X, Y positions from the dive 4607 transcript to standard UTM. A few aspects of our table need to be corrected before we can do this.
