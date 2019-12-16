@@ -104,8 +104,8 @@ dive_4607[, "X"] <- as.numeric(as.character(dive_4607[, "X"]))
 dive_4607[, "Y"] <- as.numeric(as.character(dive_4607[, "Y"] ))
 
 #8e. Convert X and Y to accurate Easting and Northing as new columns
-dive_4607 <- mutate(dive_4607, Easting= X + 600078) 
-dive_4607 <- mutate(dive_4607, Northing= Y + 224781)
+dive_4607 <- dplyr::mutate(dive_4607, Easting= X + 600078) 
+dive_4607 <- dplyr::mutate(dive_4607, Northing= Y + 224781)
 
 #8f. Write this new table to a .csv file
 write.csv(dive_4607, file = "data/dive_4607.csv") 
@@ -171,7 +171,6 @@ plot_ly(z= ~sm_matrix, x=xFromCol(sm), y=yFromRow(sm)) %>%
 This certainly a useful visualization tool but a bit too fancy for this programmer to work with so we'll analyze the 2D map and use the 3-D for reference.
 
 # Results  
-Tables and figures (maps and other graphics) are carefully planned to convey the results of your analysis. Intense exploration and evidence of many trials and failures. The author looked at the data in many different ways before coming to the final presentation of the data
 
 The GRUVEE team only recorded observations along the points along the dive track but we are interested in the entire seamount. Mass-wasting produces talus (broken up rocks) so let's look at the rough areas of Empanada.
 ```{r, echo=T, cache=T}
@@ -201,25 +200,29 @@ slope2 <- gplot(sm_slope>40,maxpixels=1e5) +
 slope2 + dive_track
 ```
 
-The next step is to compare what the program has picked out to the observations the researchers made. The researcher notes include much more than we need for this project but it seems like they consistently refer to mass-wasting as "collapse" in the notes. So we find all the point with "collapse" in the Comments column. 
+The next step is to compare what the program has picked out to the observations the researchers made. The researcher notes include much more than we need for this project but it seems like they refer to mass-wasting as "collapse" or "broken" in the comments. So we find all the points with "collapse" or "broken" in the Comments column. 
 
 ```{r, echo=T, cache=T}
 grep("collapse", dive_crop$Comments) 
+grep("broken", dive_crop$Comments)
 ```
 
 Now we make a new table of just those points
 ```{r, echo=T, cache=T}
-collapse_rows <- slice(dive_crop, c(16,18,21,22,24,25,26))
+collapse_rows <- slice(dive_crop, c(16,18,21,22,24,25,26,3,6,19,27,28))
 ```
 
-Now lets plot those points and see if they match areas with high slope
+Now lets plot those points and see if they match areas with high slope or roughness
 ```{r, echo=T, cahce=T}
 collapse_points <- geom_sf(data=collapse_rows, inherit.aes = F,col="red", size=0.5, mapping=aes())
+rough + collapse_points
+slope +collapse_points
 slope2 + collapse_points
+
 ```
 
 # Conclusions
-Clear summary adequately describing the results and putting them in context. Discussion of further questions and ways to continue investigation
+
 
 # References
 http://www.rcn.montana.edu/resources/converter.aspx  
