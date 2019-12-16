@@ -83,8 +83,8 @@ coord_split[1, "Easting"] - coord_split[1, "X"]
 coord_split[1, "Northing"] - coord_split[1, "Y"]
 
 ## We can double check to make sure our conversion returns the correct values for all points
-coord_split <- mutate(coord_split, dbl_x= X + 600078)
-coord_split <- mutate(coord_split, dbl_y= Y + 224781)
+coord_split <- dplyr::mutate(coord_split, dbl_x= X + 600078)
+coord_split <- dplyr::mutate(coord_split, dbl_y= Y + 224781)
 dplyr::select(coord_split, Easting, Northing, dbl_x, dbl_y)
 #Looks good! 
 ```
